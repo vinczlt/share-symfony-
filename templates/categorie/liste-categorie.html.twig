@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{parent()}}Liste des catégories
+{% endblock %}
+{% block body %}
+	<div class="container-fluid">
+		<h1 class="text-center text-primary mt-4 pt-4 display-1 fw-bold">Liste des catégories</h1>
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-8 p-4 m-0 text-primary">
+				<div class="table-responsive text-center">
+					{{form_start(form)}}
+					<table class="table table-hover">
+						<thead>
+							<tr class="fw-bold text-primary">
+								<th scope="col">Libelle</th>
+								<th scope="col">Date d'envoi</th>
+								{% if is_granted('ROLE_ADMIN')%}
+									<th scope="col"></th>
+									<th scope="col"></th>
+									<th scope="col"></th>
+								{% endif %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for categorie in categories |sort((a,b)=>b.libelle<=>a.libelle) %}
+								<tr class="{{ cycle(['table-primary', 'table-secondary'], loop.index0) }}">
+									<td class="text-start">{{ categorie.libelle |capitalize }}
+										{% if categorie.scategories | length > 0 %}
+											<ul>
+												{% for scategorie in categorie.scategories |sort((a, b) => a.numero <=> b.numero) %}
+													<li>{{scategorie.numero}}-{{scategorie.libelle | capitalize }}
+														{% if is_granted('ROLE_ADMIN')%}
+															<a href="{{path("app_modifier_scategorie",{'id':scategorie.id})}}">
+																<i class="bi bi-pen-fill text-dark"></i>
+															</a>
+															<a href="{{path("app_supprimer_scategorie",{'id':scategorie.id})}}">
+																<i class="bi bi-trash-fill text-dark"></i>
+															</a>
+														{% endif %}
+													</li>
+												{% endfor %}
+											</ul>
+										{% endif %}
+									</td>
+									<td>{{categorie.dateEnvoi |date("d-m-Y à H:i:s")}}</td>
+									{% if is_granted('ROLE_ADMIN')%}
+										<td>
+											<a href="{{path("app_modifier_categorie",{'id':categorie.id})}}">
+												<i class="bi bi-pen-fill text-dark"></i>
+											</a>
+										</td>
+										<td>
+											<a href="{{path("app_supprimer_categorie",{'id':categorie.id})}}">
+												<i class="bi bi-trash-fill text-dark"></i>
+											</a>
+										</td>
+										<td>{{ form_widget(form.categories[categorie.id]) }}</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					{% if is_granted('ROLE_ADMIN') and form is defined %}
+						{{ form_widget(form.supprimer) }}
+						{{ form_end(form) }}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

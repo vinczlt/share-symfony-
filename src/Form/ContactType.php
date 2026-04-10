@@ -23,8 +23,7 @@ class ContactType extends AbstractType
             ->add('email', EmailType::class, ['attr' => ['class' => 'form-control'], 'label_attr' => ['class' =>
                 'fw-bold']])
             ->add('message', TextareaType::class, ['attr' => ['class' => 'form-control', 'rows' => '7', 'cols' => '7'], 'label_attr' => ['class' => 'fw-bold']])
-            ->add('envoyer', SubmitType::class, ['attr' => ['class' => 'btn bg-primary text-white m-4'],
-                'row_attr' => ['class' => 'text-center']])
+            ->add('envoyer', SubmitType::class, ['attr' => ['class' => 'btn bg-primary text-white m-4'], 'row_attr' => ['class' => 'text-center']])
 
         ;
     }

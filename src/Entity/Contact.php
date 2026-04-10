@@ -26,6 +26,9 @@ class Contact
     #[ORM\Column(type: Types::TEXT)]
     private ?string $Message = null;
 
+    #[ORM\Column]
+    private ?\DateTime $dateEnvoi = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Contact
     public function setMessage(string $Message): static
     {
         $this->Message = $Message;
+
+        return $this;
+    }
+
+    public function getDateEnvoi(): ?\DateTime
+    {
+        return $this->dateEnvoi;
+    }
+
+    public function setDateEnvoi(\DateTime $dateEnvoi): static
+    {
+        $this->dateEnvoi = $dateEnvoi;
 
         return $this;
     }

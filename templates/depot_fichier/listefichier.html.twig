@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{parent()}}Liste des fichiers
+{% endblock %}
+{% block body %}
+	<div class="container-fluid">
+		<h1 class="text-center text-primary mt-4 pt-4 display-1 fw-bold">Liste des fichiers</h1>
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-8 p-4 m-0 text-primary">
+				<div class="table-responsive text-center">
+					<table class="table table-hover">
+						<thead>
+							<tr class="fw-bold text-primary">
+								<th scope="col">Nom</th>
+								<th scope="col">Serveur</th>
+								<th scope="col">Date d'envoi</th>
+								<th scope="col">Extension</th>
+								<th scope="col">Taille</th>
+								<th scope="col">Utilisateur</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for fichier in fichier |sort((a,b)=>b.nomOriginal<=>a.nomOriginal) %}
+								<tr class="{{ cycle(['table-primary', 'table-secondary'], loop.index0) }}">
+									<td>{{ fichier.nomOriginal | capitalize }}</td>
+									<td>{{fichier.nomServeur | capitalize }}</td>
+									<td>{{fichier.dateEnvoi | date("d-m-Y")}}</td>
+									<td>{{fichier.extension | capitalize }}</td>
+									<td>{{fichier.taille | lower}}</td>
+									<td>{{fichier.user.nom}} {{fichier.user.prenom}}</td>
+									
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
