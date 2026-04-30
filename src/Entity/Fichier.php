@@ -40,9 +40,16 @@ class Fichier
     #[ORM\ManyToMany(targetEntity: Scategorie::class, inversedBy: 'fichiers')]
     private Collection $scategories;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'fichiersRecus')]
+    private Collection $fichierRecus;
+
     public function __construct()
     {
         $this->scategories = new ArrayCollection();
+        $this->fichierRecus = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -142,6 +149,33 @@ class Fichier
     public function removeScategory(Scategorie $scategory): static
     {
         $this->scategories->removeElement($scategory);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getFichierRecus(): Collection
+    {
+        return $this->fichierRecus;
+    }
+
+    public function addFichierRecu(User $fichierRecu): static
+    {
+        if (!$this->fichierRecus->contains($fichierRecu)) {
+            $this->fichierRecus->add($fichierRecu);
+            $fichierRecu->addFichiersRecu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFichierRecu(User $fichierRecu): static
+    {
+        if ($this->fichierRecus->removeElement($fichierRecu)) {
+            $fichierRecu->removeFichiersRecu($this);
+        }
 
         return $this;
     }

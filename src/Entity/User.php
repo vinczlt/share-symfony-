@@ -74,6 +74,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'accepter')]
     private Collection $userAccepte;
 
+    /**
+     * @var Collection<int, Fichier>
+     */
+    #[ORM\ManyToMany(targetEntity: Fichier::class, inversedBy: 'fichierRecus')]
+    private Collection $fichiersRecus;
+
     public function __construct()
     {
         $this->fichiers = new ArrayCollection();
@@ -81,6 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->usersDemande = new ArrayCollection();
         $this->accepter = new ArrayCollection();
         $this->userAccepte = new ArrayCollection();
+        $this->fichiersRecus = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -317,6 +324,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->userAccepte->removeElement($userAccepte)) {
             $userAccepte->removeAccepter($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Fichier>
+     */
+    public function getFichiersRecus(): Collection
+    {
+        return $this->fichiersRecus;
+    }
+
+    public function addFichiersRecu(Fichier $fichiersRecu): static
+    {
+        if (!$this->fichiersRecus->contains($fichiersRecu)) {
+            $this->fichiersRecus->add($fichiersRecu);
+        }
+
+        return $this;
+    }
+
+    public function removeFichiersRecu(Fichier $fichiersRecu): static
+    {
+        $this->fichiersRecus->removeElement($fichiersRecu);
 
         return $this;
     }

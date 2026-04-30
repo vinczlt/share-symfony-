@@ -5,6 +5,7 @@ use App\Form\ModifierScategorieType;
 use App\Entity\Scategorie;
 use App\Form\ScategorieType;
 use App\Form\SupprimerScategorieFormType;
+use App\Repository\ScategorieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

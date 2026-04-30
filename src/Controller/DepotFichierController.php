@@ -16,7 +16,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class DepotFichierController extends AbstractController
 {
-    #[Route('/private-depotfichier', name: 'app_fichier')]
+    #[Route('/private-depotfichier', name: 'app_fichiers')]
     public function depotfichier(Request $request, ScategorieRepository $scategorieRepository, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
         $fichier = new Fichier();
@@ -57,7 +57,7 @@ final class DepotFichierController extends AbstractController
             'scategories' => $scategories,
         ]);
     }
-    #[Route('/private-listefichier', name: 'app_liste_fichier')]
+    #[Route('/admin-listefichier', name: 'app_liste_fichier')]
     public function listefichier(FichierRepository $fichierRepository): Response
     {
         $fichier = $fichierRepository->findAll();

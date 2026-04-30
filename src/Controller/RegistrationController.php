@@ -23,7 +23,7 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setDateEnvoi(new \Datetime());
+            $user->setDateEnvoi(new \Datetime("now", new \DateTimeZone("Europe/Paris")));
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
