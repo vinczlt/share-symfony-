@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class AmisController extends AbstractController
 {
@@ -89,7 +90,7 @@ class AmisController extends AbstractController
         ]);
     }
     #[Route('/fichier/envoyer/{fichier_id}/{ami_id}', name: 'app_envoyer_fichier')]
-    public function envoyerFichier(int $fichier_id, int $ami_id, FichierRepository $fichierRepo,UserRepository $userRepo, EntityManagerInterface $em): Response 
+    public function envoyerFichier(int $fichier_id, int $ami_id, FichierRepository $fichierRepo, UserRepository $userRepo, EntityManagerInterface $em): Response
     {
         $fichier = $fichierRepo->find($fichier_id);
         $ami = $userRepo->find($ami_id);
@@ -97,6 +98,10 @@ class AmisController extends AbstractController
         if (!$fichier || !$ami) {
             throw $this->createNotFoundException('Fichier ou Ami introuvable.');
         }
+        $ami->addFichiersRecu($fichier);
+
+        $em->flush();
+
         $this->addFlash('success', 'Le fichier a bien été envoyé à ' . $ami->getPrenom());
 
         return $this->redirectToRoute('app_liste_social');
@@ -104,16 +109,41 @@ class AmisController extends AbstractController
     #[Route('/mes-fichiers-recus', name: 'app_fichiers_recus')]
     public function fichiersRecus(): Response
     {
-        // On récupère l'utilisateur actuellement connecté (ex: TESTJ User)
-        $user = $this->getUser();
+        $users = $this->getUser();
 
-        // On suppose que tu as créé une méthode dans ton entité User 
-        // pour récupérer les fichiers partagés avec lui.
-        // Si tu as utilisé une autre entité (ex: "Message" ou "Partage"), il faudra interroger le Repository correspondant ici.
-        $fichiersRecus = $user->getFichiersRecus(); 
+        if (!$users) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $fichiersRecus = $users->getFichiersRecus();
 
         return $this->render('amis/fichiers_reçu.html.twig', [
             'fichiers_recus' => $fichiersRecus,
+            'user' => $users,
         ]);
+    }
+    #[Route('/fichier/annuler-partage/{fichier_id}/{ami_id}', name: 'app_annuler_partage')]
+    public function annulerPartage(int $fichier_id, int $ami_id, FichierRepository $fichierRepo, UserRepository $userRepo, EntityManagerInterface $em): Response
+    {
+        $fichier = $fichierRepo->find($fichier_id);
+        $ami = $userRepo->find($ami_id);
+
+        if (!$fichier || !$ami) {
+            throw $this->createNotFoundException('Fichier ou Ami introuvable.');
+        }
+
+        $userConnecte = $this->getUser();
+
+        if ($fichier->getUser() !== $userConnecte) {
+            throw new AccessDeniedException('Action non autorisée. Ce fichier ne vous appartient pas.');
+        }
+
+        $ami->removeFichiersRecu($fichier);
+
+        $em->flush();
+
+        $this->addFlash('success', 'Le partage du fichier avec ' . $ami->getPrenom() . ' a bien été annulé.');
+
+        return $this->redirectToRoute('app_liste_social');
     }
 }

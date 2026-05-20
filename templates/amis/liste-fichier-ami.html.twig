@@ -13,8 +13,7 @@
 						{% if app.user.fichiers | length > 0 %}
 							{% for f in app.user.fichiers %}
 								<tr>
-									<td
-										class="text-center">
+									<td class="text-center">
 										<fieldset>
 											<legend>
 												<i class="bi bi-filetype-pdf"></i>
@@ -34,6 +33,9 @@
 														{{ ami.prenom | capitalize }}
 														{{ ami.nom | upper }}
 													</a>
+													<a href="{{ path('app_annuler_partage', {'fichier_id': f.id, 'ami_id': ami.id}) }}" class="btn btn-danger btn-sm" class="btn btn-sm btn-outline-success ms-2">
+														Annuler le partage
+													</a>
 												{% endfor %}
 											</div>
 										</fieldset>
@@ -46,7 +48,7 @@
 							</tr>
 						{% endif %}
 					</table>
-					</div>
 				</div>
 			</div>
-		{% endblock %}
+		</div>
+	{% endblock %}

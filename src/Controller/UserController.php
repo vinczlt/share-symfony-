@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\UserRepository;
+use App\Entity\Fichier;
+use App\Repository\FichierRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -32,4 +34,14 @@ final class UserController extends AbstractController
                 $fichier->getNomOriginal());
         }
     }
+    #[Route('/private-telechargement-fichier-ami/{id}', name: 'app_telechargement_fichier_ami',
+        requirements: ["id" => "\d+"])]
+    public function telechargementFichierAmi(Fichier $fichier)
+    {
+        if ($fichier == null) {
+            return $this->redirectToRoute('app_profil');
+        }
+            return $this->file($this->getParameter('file_directory') . '/' . $fichier->getNomServeur(),
+                $fichier->getNomOriginal());
+        }
 }
