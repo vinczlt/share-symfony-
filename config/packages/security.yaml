@@ -10,6 +10,7 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+      
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -29,7 +30,10 @@ security:
                 # by default, the feature is enabled by checking a checkbox in the
                 # login form, uncomment the following line to always enable it.
                 #always_remember_me: true
-
+           
+            login_throttling:
+                max_attempts: 3
+                interval: '15 minutes'
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 

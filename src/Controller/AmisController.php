@@ -15,8 +15,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class AmisController extends AbstractController
 {
     #[Route('/private-amis', name: 'app_amis')]
-    public function amis(Request $request, EntityManagerInterface $em, UserRepository
-         $userRepository): Response {
+    public function amis(Request $request, EntityManagerInterface $em, UserRepository $userRepository): Response {
         if ($request->get('id') != null) {
             $id = $request->get('id');
             $userDemande = $userRepository->find($id);

@@ -43,5 +43,5 @@ final class UserController extends AbstractController
         }
             return $this->file($this->getParameter('file_directory') . '/' . $fichier->getNomServeur(),
                 $fichier->getNomOriginal());
-        }
+    }
 }

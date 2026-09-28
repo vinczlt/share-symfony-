@@ -15,7 +15,7 @@ class FichieramiType extends AbstractType
             'class' => User::class,
             'choice_label' => 'email', // Ce qui s'affiche pour chaque ami (nom, email, etc.)
             'multiple' => true,        // On peut choisir plusieurs amis
-            'expanded' => true,        // Affiche des cases à cocher (false = menu déroulant)
+            'expanded' => false,        // Affiche des cases à cocher (false = menu déroulant)
             'label' => 'Partager avec vos amis :'
         ])
         ;

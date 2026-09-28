@@ -6,6 +6,7 @@ use App\Entity\Categorie;
 use App\Entity\Contact;
 use App\Entity\Fichier;
 use App\Form\CategorieType;
+use App\Form\ChangePasswordType;
 use App\Form\ContactType;
 use App\Form\FichierUserType;
 use App\Repository\ScategorieRepository;
@@ -13,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -75,8 +77,8 @@ class BaseController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    #[Route('/profil', name: 'app_profil')]
-    public function profil(Request $request, ScategorieRepository $scategorieRepository, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    #[Route('/private-profil', name: 'app_profil')]
+    public function profil(Request $request, ScategorieRepository $scategorieRepository, EntityManagerInterface $em, SluggerInterface $slugger, UserPasswordHasherInterface $passwordHasher, ): Response
     {
         $fichier = new Fichier();
         $scategories = $scategorieRepository->findBy([], ['categorie' => 'asc', 'numero' => 'asc']);
@@ -111,7 +113,41 @@ class BaseController extends AbstractController
                 }
             }
         }
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $changePasswordForm= $this->createForm(ChangePasswordType::class);
+        $changePasswordForm->handleRequest($request);
+
+        if ($changePasswordForm->isSubmitted()) {
+
+            $oldPassword = $changePasswordForm->get('oldPassword')->getData();
+            $newPassword = $changePasswordForm->get('newPassword')->getData();
+
+            if ($oldPassword === $newPassword && $newPassword !== null) {
+                $changePasswordForm->get('newPassword')->addError(
+                    new FormError('Ton nouveau mot de passe doit être différent de l\'actuel.')
+                );
+            }
+
+            if ($changePasswordForm->isValid()) {
+
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $user,
+                    $newPassword
+                );
+
+                $user->setPassword($hashedPassword);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Ton mot de passe a bien été mis à jour !');
+            }
+        }
         return $this->render('base/profil.html.twig', [
+            'changePasswordForm' => $changePasswordForm->createView(),
             'form' => $form->createView(),
             'scategories' => $scategories,
         ]);

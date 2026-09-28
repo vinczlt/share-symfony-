@@ -6,6 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\HttpFoundation\Request;
+use App\Form\ModifierUserType;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\User;
+use App\Repository\UserRepository;
 
 class SecurityController extends AbstractController
 {
@@ -28,5 +33,39 @@ class SecurityController extends AbstractController
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    #[Route('/admin-utilisateurs/supprimer/{id}', name: 'app_supprimer_user')]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
+            $em->remove($user);
+            $em->flush();
+
+            $this->addFlash('success', 'L\'utilisateur et toutes ses données associées ont été supprimés.');
+        } else {
+            $this->addFlash('danger', 'Erreur de sécurité lors de la suppression.');
+        }
+
+        return $this->redirectToRoute('liste-user');
+    }
+
+    #[Route('/private-modifier-user{id}', name: 'app_modifier_user')]
+    public function modifierUser(Request $request, EntityManagerInterface $em, User $user): Response
+    {
+        $form = $this->createForm(ModifierUserType::class, $user);
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->persist($user);
+                $em->flush();
+                $this->addFlash('notice', 'User modifié');
+                return $this->redirectToRoute('liste-user');
+            }
+        }
+
+        return $this->render('user/modifier_user.html.twig', [
+            'ModifierUserForm' => $form->createView(),
+        ]);
     }
 }
